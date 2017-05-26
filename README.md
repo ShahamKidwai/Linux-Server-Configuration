@@ -17,11 +17,11 @@ This readme file is intended to provide a summary of packages installed in an AW
  7. Git
  8. oauth2
  
-###  **Setting up the linux server configuration:**
+###  **Setting up the Linux server configuration:**
 
-#####  **I. Getting the linux server:**
+#####  **I. Getting the Linux server:**
  
- An amazon lightsail instance was created, this provided a barebones Linux server with the needed space to run our application, once an instance was created, then the ports 123(NTP), 2200 were added onto the amazon lightsail firewall.  
+ An amazon lightsail instance was created, this provided a barebones Linux server with the needed space to run our application, once an instance had been created, then the ports 123(NTP), 2200 were added onto the amazon lightsail firewall, the next steps were to secure the server, install the needed packages and configure the server to run our application.  
  
 #####  **II. Securing the Server:**
  
@@ -32,7 +32,24 @@ This readme file is intended to provide a summary of packages installed in an AW
         `sudo apt-get upgrade`
 
 
-2. Changed standard ssh port to 2200
+2. Change standard ssh port to 2200
+   
+   open the ssh config file
+         sudo nano /etc/ssh/sshd_config
+
+   change `port 22` to `port 2200`
+   
+   change `PermitRootLogin yes` to `PermitRootLogin no`
+   
+   change `PasswordAuthentication yes` to `PasswordAuthentication no`
+   
+   save `ctrl+o` and exit `ctrl+x`
+   
+   Restart ssh for the changes to take effect: 
+   
+   `sudo service ssh restart`
+
+
 
 3. Configure uncomplicated firewall
     
@@ -50,15 +67,18 @@ This readme file is intended to provide a summary of packages installed in an AW
 
         `sudo ufw allow 80`
 
-     Turn on firewall:
+     Turn on the firewall:
 
         `sudo ufw enable`
         
-3. Created a grader user 
-    
-4. Provided the grader user a sudo access
-    
-5. Enforced keypair authentication 
+3. Create a new user account named grader
+    `adduser grader `
+     set a strong password, the password is set to "grader"
+  
+4. Provide the grader user a sudo access
+   use the command `sudo adduser <username> sudo`  
+  
+5. Enforce keypair authentication 
     
 6. Generated keypair in local machine
     
