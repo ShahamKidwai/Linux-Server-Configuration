@@ -1,10 +1,10 @@
-﻿# Linux Server Configuration for deploying python Flask Application
+﻿# Linux Server Configuration for hosting a web application
 
 
 
 ###  **Introduction**:
 
-This readme file is intended to provide a summary of packages installed in an AWS lightsail Linux server, it will provide all the steps that were taken to configure ubuntu Linux server for deploying a python flask application.
+This readme file is intended to provide a summary of packages installed in an AWS lightsail Linux server, it will provide all the steps that were taken to configure ubuntu Linux server for deploying a python flask web application.
 
    ###  **Packages Installed**:
 
@@ -23,9 +23,10 @@ This readme file is intended to provide a summary of packages installed in an AW
  
  An amazon lightsail instance was created, this provided a barebones Linux server with the needed space to run our application, once an instance had been created, then the ports 123(NTP), 2200 were added onto the amazon lightsail firewall, the next steps were to secure the server, install the needed packages and configure the server to run our application.  
  
+
 #####  **II. Securing the Server:**
  
- 1. First update and upgrade the software packages 
+1. First update and upgrade the software packages 
  
         `sudo apt-get update`
  
@@ -50,7 +51,6 @@ This readme file is intended to provide a summary of packages installed in an AW
    `sudo service ssh restart`
 
 
-
 3. Configure uncomplicated firewall
     
     Disable all incoming traffic and allow all outgoing traffic:
@@ -71,23 +71,198 @@ This readme file is intended to provide a summary of packages installed in an AW
 
         `sudo ufw enable`
         
-3. Create a new user account named grader
+4. Create a new user account named grader
     `adduser grader `
      set a strong password, the password is set to "grader"
   
-4. Provide the grader user a sudo access
-   use the command `sudo adduser <username> sudo`  
-  
-5. Enforce keypair authentication 
-    
-6. Generated keypair in local machine
-    
-7. Installed public key in grader user
+5. Provide the grader user a sudo access
+   using the command `sudo adduser <username> sudo` 
 
-8. Installed Apache 2.0
-9. Installed postgresql
-10. Created a database user named catalog with password as linuxconfig 
-11. Created a database named itemcatalog with owner as catalog
+6. Generate a keypair on a  local machine using the 
+   command `ssh-keygen` 
+
+7. Enter a paraphrase: grader
+    
+8. Install public key on a server
+
+9. Create a directory .ssh using the command `mkdir .ssh`
+
+10. Create a new file authorized_keys within this directory using the command
+`touch .ssh/authorized_keys`
+
+11. Go ahead and copy the public key stored in local machine into this file, first open the editor and then paste the contents of the public key:
+
+      `nano .ssh/authorized_keys` and then paste the public key onto this file, and save this file using the command `ctrl+x`
+      
+12. Go ahead set the correct permission on .ssh directory and the file authorized_keys
+
+        ` chmod 700 .ssh`
+   
+        `chmod 644 .ssh/authorized_keys`
+
+13. Go ahead and restart ssh using the command `sudo service ssh restart`
+
+14. Logout and reconnect as a grader but this time using the private key
+   
+      ssh grader@34.204.108.139 -p 2200 -i ~/.ssh/LinuxUdacityCourse
+
+      
+      where **LinuxUdacityCourse** is a name of the key
+
+
+
+15. Once connected as grader user, change the timezone to UTC, 
+
+16. Install postgresql using the command `sudo apt-get install postgresql`
+17. Create a database user named catalog with password as linuxconfig 
+18. Create a database named itemcatalog with owner as catalog
+
+19. install git, using the command `sudo apt-get insall git`
+
+
+20. Install Apache 2.0 sudo apt-get install apache2
+
+21. Configure Apache to hand off request to WSGI module
+    first step is to install  and enable mod_wsgi: 
+    sudo apt-get install libapache2-mod-wsgi python
+    and endable it using the command sudo a2enmod wsgi
+
+22. Move  /var/www directory
+
+23. create a directory FlaskApp and clone the github  repository in this directory using the command git clone path_to_repository.
+  
+24. After cloning move to directory /var/www/FlaskApp/ItemCatalog
+25. Rename the file project.py to __init__.py
+26. Save and close the file
+27. Install python, using the command sudo apt-get install python-pip
+
+28. Open the database setup file and make the following changes:
+
+    cd /var/www/FlaskApp/tutor_site
+
+    sudo nano db_setup.py
+
+    change
+
+    engine = create_engine('sqlite:///itemcatalog.db')
+
+    to
+
+    engine = create_engine("postgresql://catalog:linuxconfig@localhost/itemcatalog")
+    save ctrl+O and exit ctrl+X
+
+   Make a similar change in your __init__.py file:
+
+   `nano __init__.py`
+
+   change
+
+   engine = create_engine('sqlite:///itemcatalog.db')
+
+   to
+
+  engine = create_engine("postgresql://catalog:linuxconfig@localhost/itemcatalog")
+   save ctrl+O and exit ctrl+X
+
+
+29. Install virtual environment using the command `sudo pip install virtualenv` this is the environment where our application will run.
+
+
+29. give the name to this temporary environment using the command `sudo virtualenv venv`
+
+30. Activate this environment using the command 
+    source venv/bin/activate
+
+31. `sudo pip install Flask`
+
+32. Install all the additional modules
+    
+    `sudo pip install httplib2`
+
+    `sudo pip install requests`
+
+    `sudo pip install oauth2client`
+
+33. Create your database: `sudo python db_setup.py`
+
+34. open __init__.py and change the path to client_secret.json to absolute path. 
+
+     change
+
+         CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+
+       to 
+
+         CLIENT_ID = json.loads(open('/var/www/FlaskApp/ItemCatalog/client_secrets.json', 'r').read())['web']['client_id']
+    
+    change
+
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+
+      to
+
+        oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/ItemCatalog/client_secrets.json', scope='')
+
+
+35.   Run   __init__.py  file using the command  `sudo python __init__.py`
+
+  If everything seems good then it should display 
+  
+  “Running on http://localhost:5000/” or "Running on http://127.0.0.1:5000/"
+
+go ahead and deactivate the environment using the command `deactivate`
+
+sudo nano /etc/apache2/sites-available/FlaskApp.conf
+Add the following lines of code to the file to configure the virtual host. Be sure to change the ServerName to your domain or cloud server's IP address:
+
+<VirtualHost *:80>
+		ServerName mywebsite.com
+		ServerAdmin admin@mywebsite.com
+		WSGIScriptAlias / /var/www/FlaskApp/flaskapp.wsgi
+		<Directory /var/www/FlaskApp/FlaskApp/>
+			Order allow,deny
+			Allow from all
+		</Directory>
+		Alias /static /var/www/FlaskApp/FlaskApp/static
+		<Directory /var/www/FlaskApp/FlaskApp/static/>
+			Order allow,deny
+			Allow from all
+		</Directory>
+		ErrorLog ${APACHE_LOG_DIR}/error.log
+		LogLevel warn
+		CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+
+Save and close the file.
+
+Enable the virtual host with the following command:
+sudo `a2ensite FlaskApp`
+
+and disable the host `a2dissite 000-default`
+
+Apache uses the .wsgi file to serve the Flask app. 
+
+Move to the /`var/www/FlaskApp` directory and create a file named `flaskapp.wsgi` with following commands:
+
+`cd /var/www/FlaskApp`
+
+`sudo nano flaskapp.wsgi `
+
+Add the following lines of code to the flaskapp.wsgi file:
+
+#!/usr/bin/python
+import sys
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0,"/var/www/FlaskApp/")
+
+from FlaskApp import app as application
+application.secret_key = 'Add your secret key'
+
+Go ahead and restart apache 
+
+`sudo service Apache 2 restart`
 
  ### **How to access the  server**
  
@@ -100,9 +275,10 @@ This readme file is intended to provide a summary of packages installed in an AW
         
        ssh into server as a grader user using the syntax below
        ssh grader@34.204.108.139 port private key 
-       where port equals 2200
+       where port equals -p 2200
        private key is LinuxUdacityCourse`
-       
+       paraphrase for the key is : grader
+
        
   below are the content of the private key named LinuxUdacityCourse:
 
@@ -139,5 +315,4 @@ ckBY81A7VRy8OsBzOGxMb3rLBsfhtqPCdGdbX/TUDFI4e4EZzjwrIYXJJbYfg4xk
 
 -----END RSA PRIVATE KEY-----
 
- #### paraphrase for the key is :  **grader**
-       
+ 
