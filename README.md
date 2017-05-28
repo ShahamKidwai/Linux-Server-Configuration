@@ -267,7 +267,7 @@ Go ahead and restart apache
  ### **How to access the  server**
  
          server ip address: 54.87.221.214
-         server URL: http://ec2-54.87.221.214.compute-1.amazonaws.com/
+         server URL: http://ec2-54-87-221-214.compute-1.amazonaws.com/
          ssh port: 2200
        
 
