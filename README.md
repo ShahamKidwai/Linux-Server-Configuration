@@ -21,7 +21,7 @@ This readme file is intended to provide a summary of packages installed in an AW
 
 #####  **I. Getting the Linux server:**
  
- An amazon lightsail instance was created, this provided a barebones Linux server with the needed space to run our application, once an instance had been created, then the ports 123(NTP), 2200 were added onto the amazon lightsail firewall, the next steps were to secure the server, install the needed packages and configure the server to run our application.  
+ To get a linux server, an amazon lightsail instance came in to play as this provided a barebones Linux server with the needed space to run our application, once an instance had been created, then the ports 123(NTP), 2200 were added onto the amazon lightsail firewall, the next steps were to secure the server, install the needed packages and configure the server to run our application.  
  
 
 #####  **II. Securing the Server:**
