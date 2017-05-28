@@ -104,7 +104,7 @@ This readme file is intended to provide a summary of packages installed in an AW
 
 14. Logout and reconnect as a grader but this time using the private key
    
-      ssh grader@54-87-221-214 -p 2200 -i ~/.ssh/LinuxUdacityCourse
+      ssh grader@54.87.221.214 -p 2200 -i ~/.ssh/LinuxUdacityCourse
 
       
       where **LinuxUdacityCourse** is a name of the key
