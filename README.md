@@ -266,15 +266,15 @@ Go ahead and restart apache
 
  ### **How to access the  server**
  
-         server ip address: 54-87-221-214
-         server URL: http://ec2-54-87-221-214.compute-1.amazonaws.com/
+         server ip address: 54.87.221.214
+         server URL: http://ec2-54.87.221.214.compute-1.amazonaws.com/
          ssh port: 2200
        
 
   How to access the server as a grader user:
         
        ssh into server as a grader user using the syntax below
-       ssh grader@54-87-221-214 port private key 
+       ssh grader@54.87.221.214 port private key 
        where port equals -p 2200
        private key is LinuxUdacityCourse`
        paraphrase for the key is : grader
